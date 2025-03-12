@@ -1,0 +1,37 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: testpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql  # Persist database data
+    networks:
+      - my_network
+
+
+  app:
+    build: .
+    container_name: python_app
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: testdb
+      DB_USER: testuser
+      DB_PASSWORD: testpassword
+    networks:
+      - my_network
+
+volumes:
+  db_data:
+
+networks:
+  my_network:

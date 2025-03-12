@@ -2,7 +2,7 @@ import os
 import mysql.connector 
 from mysql.connector import Error
 import logging
-from conectiondb import conn
+from python_docker_mysql.scripts.connection_testdb import conn
 
 select_movies_inner_join_ratings_query = """
                         SELECT title, AVG(rating) as average_rating

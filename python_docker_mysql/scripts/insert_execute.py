@@ -2,15 +2,17 @@ import os
 import mysql.connector 
 from mysql.connector import Error
 import logging
-from conectiondb import conn
+from connections import testdb_conn 
 
-# db_config = {
-#     "host": os.getenv("DB_HOST", "db"),
-#     "port": os.getenv("DB_PORT", 3306),
-#     "database": os.getenv("DB_NAME", "testdb"),
-#     "user": os.getenv("DB_USER", "testuser"),
-#     "password": os.getenv("DB_PASSWORD", "testpassword"),
-# }
+create_movies_table_query = """
+CREATE TABLE IF NOT EXISTS movies(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100),
+    release_year YEAR(4),
+    genre VARCHAR(100),
+    collection_in_mil INT
+)
+"""
 
 
 insert_movies_query = """
@@ -48,15 +50,28 @@ VALUES
     ("Drishyam", 2015, "Mystery", 3.0)
 """
 
-def insertExecute(query):
+def execute_query(query, data=None, many=False):
+    """Execute a SQL query with optional data."""
     try:
-        # conn = mysql.connector.connect(**db_config)
-        with conn.cursor() as cursor:
-            cursor.execute(query)
-            conn.commit()
-        return logging.info(f"Query executed succesfully.")
+        connection = testdb_conn.connect()
+        if connection is None:
+            raise Exception("Failed to connect to the database.")
+
+        with connection.cursor() as cursor:
+            if data:
+                if many:
+                    cursor.executemany(query, data)
+                else:
+                    cursor.execute(query, data)
+            else:
+                cursor.execute(query)
+            connection.commit()
+
+        logging.info("Query executed successfully.")
     except Exception as e:
-        print(e)
+        logging.error(f"Error executing query: {e}")
+    finally:
+        testdb_conn.close()
 
 
-insertExecute(query=insert_movies_query)
+execute_query(query=insert_movies_query)

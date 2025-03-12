@@ -3,7 +3,7 @@ import mysql.connector
 from mysql.connector import Error
 import logging
 from decimal import Decimal
-from conectiondb import conn
+from python_docker_mysql.scripts.connection_testdb import conn
 
 select_movies_query = """
                         SELECT CONCAT(title, " (", release_year, ")"),
